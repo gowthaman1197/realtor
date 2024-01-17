@@ -6,7 +6,6 @@ function ForgetPassword() {
   const [email, setEmail] = useState("");
 
   function onChangeHandler(e) {
-    e.preventDefault();
     setEmail(e.target.value);
   }
 

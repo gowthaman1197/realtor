@@ -12,12 +12,13 @@ function SignIn() {
     password: "",
   });
 
+  // const [email, password] = formData;
+
   function showpasswordHandler() {
     setShowPassword((prevStatePwd) => !prevStatePwd);
   }
 
   function onChangeHandler(e) {
-    e.preventDefault();
     setFormData((prevState) => ({
       ...prevState,
       [e.target.id]: e.target.value,

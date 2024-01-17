@@ -3,6 +3,15 @@ import { IoEye } from "react-icons/io5";
 import { IoEyeOff } from "react-icons/io5";
 import { Link } from "react-router-dom";
 import OAuth from "../components/OAuth";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
+import { db } from "../firebase";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
@@ -13,16 +22,46 @@ function SignUp() {
     password: "",
   });
 
+  // const [name, email, password] = formData;
+
+  const navigate = useNavigate();
+
   function showpasswordHandler() {
     setShowPassword((prevStatePwd) => !prevStatePwd);
   }
 
   function onChangeHandler(e) {
-    e.preventDefault();
     setFormData((prevState) => ({
       ...prevState,
       [e.target.id]: e.target.value,
     }));
+  }
+
+  async function onSubmitHandler(e) {
+    e.preventDefault();
+    try {
+      const auth = getAuth();
+      const userCredentail = await createUserWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password
+      );
+      updateProfile(auth.currentUser, {
+        displayName: formData.name,
+      });
+      const user = userCredentail.user;
+
+      const formDataCopy = { ...formData };
+      delete formDataCopy.password;
+
+      formDataCopy.timestamp = serverTimestamp();
+
+      await setDoc(doc(db, "users", user.uid), formDataCopy);
+      // toast.success("Sign up was successful.");
+      navigate("/");
+    } catch (error) {
+      toast.error("Something went wrong with the registration.");
+    }
   }
 
   return (
@@ -38,7 +77,7 @@ function SignUp() {
           />
         </div>
         <div className="w-full md:w-[67%] lg:w-[40%] lg:ml-20">
-          <form>
+          <form onSubmit={onSubmitHandler}>
             <input
               type="name"
               id="name"
