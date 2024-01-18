@@ -3,6 +3,9 @@ import { IoEye } from "react-icons/io5";
 import { IoEyeOff } from "react-icons/io5";
 import { Link } from "react-router-dom";
 import OAuth from "../components/OAuth";
+import { signInWithEmailAndPassword, getAuth } from "firebase/auth";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 function SignIn() {
   const [showPassword, setShowPassword] = useState(false);
@@ -11,6 +14,7 @@ function SignIn() {
     email: "",
     password: "",
   });
+  const navigate = useNavigate();
 
   // const [email, password] = formData;
 
@@ -23,6 +27,24 @@ function SignIn() {
       ...prevState,
       [e.target.id]: e.target.value,
     }));
+  }
+
+  async function onSubmitSignInHandler(e) {
+    e.preventDefault();
+    try {
+      const auth = getAuth();
+      const userLoginCredentail = await signInWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password
+      );
+      if (userLoginCredentail.user) {
+        navigate("/");
+        toast.success("You have signed in successfully.");
+      }
+    } catch (error) {
+      toast.error("Bad user credentials.");
+    }
   }
 
   return (
@@ -38,7 +60,7 @@ function SignIn() {
           />
         </div>
         <div className="w-full md:w-[67%] lg:w-[40%] lg:ml-20">
-          <form>
+          <form onSubmit={onSubmitSignInHandler}>
             <input
               type="email"
               id="email"

@@ -50,6 +50,7 @@ function SignUp() {
         displayName: formData.name,
       });
       const user = userCredentail.user;
+      console.log(user);
 
       const formDataCopy = { ...formData };
       delete formDataCopy.password;
@@ -57,7 +58,8 @@ function SignUp() {
       formDataCopy.timestamp = serverTimestamp();
 
       await setDoc(doc(db, "users", user.uid), formDataCopy);
-      // toast.success("Sign up was successful.");
+
+      toast.success("Sign up was successful.");
       navigate("/");
     } catch (error) {
       toast.error("Something went wrong with the registration.");
