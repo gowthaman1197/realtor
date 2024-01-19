@@ -1,6 +1,9 @@
-import { getAuth } from "firebase/auth";
+import { getAuth, updateProfile } from "firebase/auth";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "../firebase";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function Profile() {
   const auth = getAuth();
@@ -10,12 +13,41 @@ function Profile() {
     email: auth.currentUser.email,
   });
 
+  const [changeEditDetail, setChangeEditDetails] = useState(false);
+
   const { name, email } = formProfileData;
   const navigate = useNavigate();
 
   function loggedOutHandler() {
     auth.signOut();
     navigate("/");
+  }
+
+  function editHandler(e) {
+    setFormProfileData((prevState) => ({
+      ...prevState,
+      [e.target.id]: e.target.value,
+    }));
+  }
+
+  async function onSubmitProfileHandler() {
+    try {
+      if (auth.currentUser.displayName !== name) {
+        // update display name in firebase auth
+        await updateProfile(auth.currentUser, {
+          displayName: name,
+        });
+
+        // update name in the firestore
+        const docRef = doc(db, "users", auth.currentUser.uid);
+        await updateDoc(docRef, {
+          name,
+        });
+      }
+      toast.success("Profile details updated.");
+    } catch (error) {
+      toast.error("Could not update the profile details.");
+    }
   }
 
   return (
@@ -28,8 +60,11 @@ function Profile() {
               type="text"
               id="name"
               value={name}
-              disabled
-              className="mb-6 w-full px-4 py-2 text-xl text-gray-700 bg-white border border-gray-300 rounded transition duration-300 ease-in-out"
+              disabled={!changeEditDetail}
+              onChange={editHandler}
+              className={`mb-6 w-full px-4 py-2 text-xl text-gray-700 bg-white border border-gray-300 rounded transition duration-300 ease-in-out ${
+                changeEditDetail && "bg-red-200 focus:bg-red-200"
+              }`}
             />
             <input
               type="email"
@@ -41,8 +76,14 @@ function Profile() {
             <div className="mb-6 flex justify-between whitespace-nowrap text-sm sm:text-lg">
               <p className="flex items-center">
                 Do you want to change your name?{" "}
-                <span className="text-red-600 hover:text-red-700 transition ease-in-out duration-200 ml-1 cursor-pointer">
-                  Edit
+                <span
+                  onClick={() => {
+                    changeEditDetail && onSubmitProfileHandler();
+                    setChangeEditDetails((prevState) => !prevState);
+                  }}
+                  className="text-red-600 hover:text-red-700 transition ease-in-out duration-200 ml-1 cursor-pointer"
+                >
+                  {changeEditDetail ? "Apply Change" : "Edit"}
                 </span>
               </p>
               <p
