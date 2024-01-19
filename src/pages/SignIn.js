@@ -16,7 +16,7 @@ function SignIn() {
   });
   const navigate = useNavigate();
 
-  // const [email, password] = formData;
+  const { email, password } = formData;
 
   function showpasswordHandler() {
     setShowPassword((prevStatePwd) => !prevStatePwd);
@@ -35,8 +35,8 @@ function SignIn() {
       const auth = getAuth();
       const userLoginCredentail = await signInWithEmailAndPassword(
         auth,
-        formData.email,
-        formData.password
+        email,
+        password
       );
       if (userLoginCredentail.user) {
         navigate("/");
@@ -64,7 +64,7 @@ function SignIn() {
             <input
               type="email"
               id="email"
-              value={formData.email}
+              value={email}
               className="mb-6 w-full px-4 py-2 text-xl text-gray-700 bg-white border-gray-300 rounded transition ease-in-out"
               placeholder="Email address"
               autoComplete="off"
@@ -74,7 +74,7 @@ function SignIn() {
               <input
                 type={showPassword ? "text" : "password"}
                 id="password"
-                value={formData.password}
+                value={password}
                 className="w-full px-4 py-2 text-xl text-gray-700 bg-white border-gray-300 rounded transition ease-in-out"
                 placeholder="Password"
                 autoComplete="off"

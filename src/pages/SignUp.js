@@ -22,7 +22,7 @@ function SignUp() {
     password: "",
   });
 
-  // const [name, email, password] = formData;
+  const { name, email, password } = formData;
 
   const navigate = useNavigate();
 
@@ -43,11 +43,11 @@ function SignUp() {
       const auth = getAuth();
       const userCredentail = await createUserWithEmailAndPassword(
         auth,
-        formData.email,
-        formData.password
+        email,
+        password
       );
       updateProfile(auth.currentUser, {
-        displayName: formData.name,
+        displayName: name,
       });
       const user = userCredentail.user;
       console.log(user);
@@ -83,7 +83,7 @@ function SignUp() {
             <input
               type="name"
               id="name"
-              value={formData.name}
+              value={name}
               className="mb-6 w-full px-4 py-2 text-xl text-gray-700 bg-white border-gray-300 rounded transition ease-in-out"
               placeholder="Full name"
               autoComplete="off"
@@ -92,7 +92,7 @@ function SignUp() {
             <input
               type="email"
               id="email"
-              value={formData.email}
+              value={email}
               className="mb-6 w-full px-4 py-2 text-xl text-gray-700 bg-white border-gray-300 rounded transition ease-in-out"
               placeholder="Email address"
               autoComplete="off"
@@ -102,7 +102,7 @@ function SignUp() {
               <input
                 type={showPassword ? "text" : "password"}
                 id="password"
-                value={formData.password}
+                value={password}
                 className="w-full px-4 py-2 text-xl text-gray-700 bg-white border-gray-300 rounded transition ease-in-out"
                 placeholder="Password"
                 autoComplete="off"
